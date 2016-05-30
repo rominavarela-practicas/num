@@ -9,6 +9,7 @@ function [ ans ] = gaussSeidel_func( C , R , E )
     
     prev_ans = zeros(1,len);
     ans = zeros(1,len);
+    acc = 0;
     
     % while fault tolerance is not surpassed
     while (margin > E )
@@ -24,17 +25,21 @@ function [ ans ] = gaussSeidel_func( C , R , E )
             end
             % divide with diagonal element
             ans(row)= ans(row) / C(row,row);
-
+            
         end
         
         % compute margin
         margin = (verctorMagnitude_func( ans ) ...
                   - verctorMagnitude_func( prev_ans )) / ...
                   verctorMagnitude_func( ans );
+        margin = abs(margin);
         prev_ans = ans;
+        acc= acc+1;
     end
     
+    disp(['   required margin: ' num2str(E)]);
     disp(['   final margin: ' num2str(margin)]);
+    disp(['   iterations: ' num2str(acc)]);
     
 end
 

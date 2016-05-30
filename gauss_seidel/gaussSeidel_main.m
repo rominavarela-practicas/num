@@ -13,9 +13,7 @@ R = [
         71.4
     ]
 
-E = 0.001
-
-x= gaussSeidel_func( C , R, E )
+x= gaussSeidel_func( C , R, 0.01 )
 
 clear all;
 
@@ -36,8 +34,6 @@ R = [
         15
     ]
 
-E = 0.001
-
-x= gaussSeidel_func( C , R, E )
+x= gaussSeidel_func( C , R, 0.01 )
 
 clear all;
