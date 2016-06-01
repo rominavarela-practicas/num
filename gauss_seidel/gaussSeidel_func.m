@@ -1,45 +1,50 @@
-function [ ans ] = gaussSeidel_func( C , R , E )
+function [ r ] = gaussSeidel_func( C , R , E )
 %GAUSSSEIDEL_FUNC Summary of this function goes here
 %   C coeficient matrix, req: squared and diagonal dominant
 %   R results matrix
 %   E fault tolerance
-    
-    margin = 2;
-    len = length(C);
-    
-    prev_ans = zeros(1,len);
-    ans = zeros(1,len);
-    acc = 0;
+debug = false;
+
+r0 = R.*0;
+r = R.*0;
+len = size(C,1);
+
+i=0;
+e= 2;
     
     % while fault tolerance is not surpassed
-    while (margin > E )
+    while(e>E)
         % for each row
         for row = 1:len
-            % sum result's matrix element
-            ans(row)= R(row);
+            % join result's matrix element
+            r(row) = R(row);
             for col = 1:len
                 if(col~=row)
                     % with each partial result not in diagonal
-                    ans(row)= ans(row) - ( C(row,col) * ans(col));
+                    r(row) = r(row) - ( C(row,col) * r(col));
                 end
             end
             % divide with diagonal element
-            ans(row)= ans(row) / C(row,row);
-            
+            r(row) = r(row) / C(row,row);
         end
         
         % compute margin
-        margin = (verctorMagnitude_func( ans ) ...
-                  - verctorMagnitude_func( prev_ans )) / ...
-                  verctorMagnitude_func( ans );
-        margin = abs(margin);
-        prev_ans = ans;
-        acc= acc+1;
+        e= norm(r-r0)/norm(r);
+        r0= r;
+        
+        if(debug)
+            i= i+1;
+            r.*1
+        end
+        
     end
     
-    disp(['   required margin: ' num2str(E)]);
-    disp(['   final margin: ' num2str(margin)]);
-    disp(['   iterations: ' num2str(acc)]);
     
+    if(debug)
+        disp(' ');
+        disp(['   required margin: ' num2str(E)]);
+        disp(['   final margin: ' num2str(e)]);
+        disp(['   iterations: ' num2str(i)]);
+    end
 end
 
