@@ -3,14 +3,14 @@ function [ gY ] = interpolation_func( X , fX , granularity )
 %   X
 %   fX discrete values corresponding to each x
 %   granularity
-    debug = true;
+    debug = false;
     
     fNum = numel(fX);
     
     % fx holds the 1 last set
     % fX concats each computed set
     fx = fX;
-    fX = [ fX , zeros(size(X)) ];
+    fX = [ fX , zeros(fNum,1) ];
     
     for j = 2:fNum
         
@@ -19,7 +19,7 @@ function [ gY ] = interpolation_func( X , fX , granularity )
         end
         
         fx= fX(1:fNum,j);
-        fX = [ fX , zeros(size(X)) ];
+        fX = [ fX , zeros(fNum,1) ];
     end
     
     % A = diagonal - 1
@@ -29,10 +29,10 @@ function [ gY ] = interpolation_func( X , fX , granularity )
     % g(x) = a0 + a1(x-x0) + a2(x-x0)(x-x1) ...
     a = X(1);
     b = X(fNum);
-    gX = [a:granularity:b];
-    gY = zeros(size(gX));
-    
+    gX = linspace (a,b,fNum/granularity);
     gNum = numel(gX);
+    
+    gY = zeros(gNum,1);
     
     for gi = 1:gNum
          x = gX(gi);
@@ -49,7 +49,10 @@ function [ gY ] = interpolation_func( X , fX , granularity )
     if(debug)
         fX
         A
+        figure;
         plot(gX,gY)
+        xlabel('gX')
+        ylabel('gY (ans)')
     end
 end
 
