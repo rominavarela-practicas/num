@@ -1,0 +1,44 @@
+function [ func ] = dynamicSolution_func( x, y, sub )
+%GENERALSOLUTION_FUNC Summary of this function goes here
+%   Detailed explanation goes here
+    
+    %% Calculate X
+    % apply each subFunction(x)
+    nSub = numel(sub);
+    
+    X = [];
+    for i = 1:nSub
+        f = cell2mat(sub(i));
+        X = [ X , arrayfun(f,x) ];
+    end
+    
+    %% Calculate A
+    A = inv(X' * X) * ( X' * y);
+    
+    %% Join Subfunctions
+    % (a1*sub1) + (a2-sub2) ... + (aN-subN)
+    
+    subs = cell(1,nSub);
+    
+    concat = @(a,func) @(x) a * f(x);    
+    for i = 1:nSub
+        a = A(i)
+        f = cell2mat(sub(i))
+        subs{i} = concat (a,f)
+    end
+    
+    subs
+    
+    sum([1,2,3])
+    sum( [ sub1(x) sub2(x))
+    sum(
+    
+    func = @(x) sum(cellfun(@(y) y(x), subs))
+%     func = [ '(' , num2str(A(1)), '*', cell2mat(sub(1)) , ')' ];
+%     for i = 2:nSub
+%         func = [ func , ' + (' , num2str(A(1)), '* (', cell2mat(sub(i)) , '))'];
+%     end
+%     
+%     func = inline(func);
+end
+

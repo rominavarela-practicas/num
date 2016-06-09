@@ -8,20 +8,25 @@ function [ func ] = dynamicSolution_func( x, y, sub )
     
     X = [];
     for i = 1:nSub
-        f = inline(cell2mat(sub(i)));
-        X = [ X , f(x) ];
+        f = cell2mat(sub(i));
+        X = [ X , arrayfun(f,x) ];
     end
     
     %% Calculate A
     A = inv(X' * X) * ( X' * y);
     
     %% Join Subfunctions
-    % (a1*sub1) + (a2-sub2) ... + (aN-subN)
-    func = [ '(' , num2str(A(1)), '*', cell2mat(sub(1)) , ')' ];
-    for i = 2:nSub
-        func = [ func , ' + (' , num2str(A(1)), '* (', cell2mat(sub(i)) , '))'];
+    % http://www.mathworks.com/matlabcentral/newsreader/view_thread/325818
+    
+    % subs =  { a1*sub1 , a2*sub2 , ... , aN*subN }
+    subs = cell(nSub,1);
+    for i = 1:nSub
+        a = A(i);
+        f = cell2mat(sub(i));
+        subs{i} = @(x) a * f(x);
     end
     
-    func = inline(func);
+    % func = (a1*sub1) + (a2*sub2) + (...) + (aN*subN)
+    func = @(x) sum(cellfun(@(y) y(x), subs));
 end
 

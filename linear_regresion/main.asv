@@ -26,18 +26,18 @@ switch(solution)
     case 2
         % Solution 2 - General Solution for exactly 2 subfunctions
         sub1 = @(x) x;
-        sub2 = @(x) 1;
+        sub2 = @(x) x-(x-1);
         func = staticSolution_func (x,y,sub1,sub2)
         
     case 3
         % Solution 3 - General Solution for N subfunctions
-        sub = { @(x) x , @(x) 1 };
+        sub = { 'x', 'x' };
         func = dynamicSolution_func (x,y,sub)
 end
 
 %% Substitution and Plot
 
-fx = arrayfun(func,x);
+fx = func(x);
 
 figure;
 hold on;

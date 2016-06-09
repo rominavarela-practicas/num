@@ -4,10 +4,10 @@ function [ func ] = staticSolution_func( x, y, sub1, sub2 )
     
     %% Calculate X
     % apply each subFunction(x)
-    X = [sub1(x),sub2(x)];
+    X = [ arrayfun(sub1,x) , arrayfun(sub2,x) ];
     
     %% Calculate A
-    A = inv(X' * X) * ( X' * y);
+    A = inv(X' * X) * ( X' * y)
     
     %% Concat Subfunctions
     % (a1*sub1) + (a2-sub2) ... + (aN-subN)

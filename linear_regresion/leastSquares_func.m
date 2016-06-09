@@ -24,7 +24,7 @@ b2 = (sumx^2) - (sumx2.*n);
 b = b1 / b2;
 
 % func
-func = inline( [num2str(b),' + ( ',num2str(m) , ' * x )' ]);
+func = @(x) (m * x) + b ;
 
 end
 
