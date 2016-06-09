@@ -1,0 +1,50 @@
+% anonymous function reference
+% http://www.mathworks.com/help/matlab/matlab_prog/anonymous-functions.html
+
+% http://theskylive.com/252p-info#earthdistance
+%x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+%y = [20.56, 20.64, 20.72, 20.80, 20.88, 20.97, 21.05, 21.13, 21.21, 21.29, 21.37, 21.45, 21.53, 21.61];
+
+%% DATA
+
+clear all;
+close all;
+clc;
+
+x = [65, 76, 80, 93, 51, 62, 70, 73, 82, 86, 78, 60]';
+y = [69, 81, 86, 95, 53, 60, 75, 73, 86, 88, 77, 63]';
+
+%% SOLUTION
+% f = mx + b
+solution = 3;
+
+switch(solution)
+    case 1
+        % Solution 1 - Least Squares
+        func = leastSquares_func(x,y)
+        
+    case 2
+        % Solution 2 - General Solution for exactly 2 subfunctions
+        sub1 = @(x) x;
+        sub2 = @(x) x-(x-1);
+        func = staticSolution_func (x,y,sub1,sub2)
+        
+    case 3
+        % Solution 3 - General Solution for N subfunctions
+        sub = { 'x', 'x-(x-1)' };
+        func = dynamicSolution_func (x,y,sub)
+end
+
+%% Substitution and Plot
+
+fx = func(x);
+
+figure;
+hold on;
+
+plot(x,fx);
+plot(x,y,'m*');
+xlabel('x');
+ylabel('f(x)');
+
+hold off;
