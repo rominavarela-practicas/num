@@ -1,28 +1,37 @@
+# http://fourier.eng.hmc.edu/e161/lectures/ica/node13.html
 import numpy as np
 import sympy as sym
 
+"""
+@param N
+@returns x0, x1 ... xN symbols
+"""
 def get_symbols(N):
     X = []
     for i in xrange( 0 , N ):
         X.append( sym.Symbol( 'x'+str(i) ) )
     return X
 
+"""
+@param functions[]
+@param symbols[]
+@returns symbolic function matrix
+"""
 def get_jacobian( functions , symbols ):
-    # jacobian left side (derivates)
-    jacobian_l = []
+    jacobian = []
     for func in functions:
         sub = []
         for i in xrange( 0 , len(symbols) ):
             sub.append( sym.diff( func , symbols[i] , 1 ) )
-        jacobian_l.append( sub )
+        jacobian.append( sub )
 
-    # jacobian right side (complements)
-    jacobian_r = []
-    for func in functions:
-        jacobian_r.append( -func )
+    return jacobian
 
-    return jacobian_l, jacobian_r
-
+"""
+@param symbolic functions[]
+@param symbols[]
+@returns lambda functions
+"""
 def lambdify( functions , symbols ):
     lambdas = []
     for f in functions:
@@ -32,44 +41,53 @@ def lambdify( functions , symbols ):
             lambdas.append( sym.lambdify( symbols , f , ) )
     return lambdas
 
-def solution( functions , coeficients , error ):
+"""
+@param lambda functions[]
+@param function arguments/coeficients[]
+@returns lambda functions
+"""
+def evaluate( functions , coeficients ):
+    eval = []
+    for f in functions:
+        if type(f) is list:
+            eval.append( evaluate( f , coeficients ) )
+        else:
+            eval.append( f(*coeficients) )
+    return eval
+
+"""
+@param functions[] where number of elements = N
+@param coeficients[] where number of elements = N
+@returns newton-raphson solution
+"""
+def solution( functions , x , error , maxit=100):
     ##########
     # SYMBOLIC INIT
     N = len(functions)
-    coeficients = np.asarray(coeficients, dtype=float)
     symbols = get_symbols(N)
-    jacobian_l, jacobian_r = get_jacobian( functions , symbols )
+    jacobian = get_jacobian( functions , symbols )
 
     ##########
-    # LAMBDA INIT
-    jacobian_l = lambdify( jacobian_l , symbols )
-    jacobian_r = lambdify( jacobian_r , symbols )
+    # TO LAMBDA
+    functions = lambdify( functions , symbols )
+    jacobian = lambdify( jacobian , symbols )
 
-    ##########
-    # EVALUATION CYCLE
-    left = np.zeros((N,N))
-    right = np.zeros(N)
-    e = 1
+    e = error + 1
+    for i in xrange(0,maxit):
+        ##########
+        # EVALUATION
+        x0 = np.asarray(x, dtype=float)
+        f = evaluate( functions , x0 )
+        j = evaluate( jacobian , x0 )
+        j = np.linalg.inv(j)
 
-    while e > error:
-        coeficients0 = np.copy(coeficients)
+        for xi,terms in enumerate( np.multiply(j,f) ):
+            x[xi] = x0[xi] - terms.sum()
 
-        # evaluation
-        for row in xrange( 0 , N ):
-            for col in xrange( 0 , N ):
-                left[row][col] = jacobian_l[row][col](*coeficients)
+        # ERROR
+        e = np.linalg.norm( x - x0 ) / np.linalg.norm ( x )
+        print "e = " , e
+        if e <= error: break
 
-        for row in xrange( 0 , N ):
-            right[row] = jacobian_r[row](*coeficients)
-
-        # inference
-        for row in xrange( 0 , N ):
-            val = right[row]
-            for col in xrange( 0 , N ):
-                if row != col:
-                    val -= coeficients[col] * left[row][col]
-            coeficients[row] = val / left[row][row]
-
-        e = np.linalg.norm( coeficients - coeficients0 ) / np.linalg.norm ( coeficients )
-        
-    return coeficients
+    print ' '
+    return x
